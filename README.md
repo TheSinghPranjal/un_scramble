@@ -1,68 +1,48 @@
-# Planly (event_reminder)
+# Unscramble
 
-A Flutter calendar + reminder app with optional Google Sign-In and two-way
-Google Calendar sync.
+A casual word puzzle built with Flutter and Riverpod. Drag (or tap) scrambled letters into the answer slots to rebuild the hidden word. A wrong letter costs a life. You get 10 lives, one for each letter of **UNSCRAMBLE**, and 2:00 on the clock. After 2 mistakes you get one free hint.
 
-## Getting Started
+## Run
 
 ```bash
 flutter pub get
-flutter run
+flutter run            # pick an Android device/emulator
+flutter test           # controller rules, life bar, word list, game screen
 ```
 
-Without OAuth client IDs the app uses a developer stub for Google Sign-In
-(you can walk through onboarding, but event import will honestly fail).
+Fonts (Fredoka, Nunito) come from `google_fonts`. They download on first launch and are then cached. The app declares the `INTERNET` permission for this. If you want fonts to work fully offline, bundle the `.ttf` files under `assets/google_fonts/`.
 
-## Google Sign-In & Calendar setup
+## Adding words
 
-### 1. Google Cloud Console
+Edit `assets/words/words.json`:
 
-1. Create a project (or pick an existing one).
-2. Enable the **Google Calendar API**.
-3. Configure the **OAuth consent screen** (External). Add yourself as a
-   **test user** — Calendar scopes are sensitive, so unverified apps only
-   work for listed test users.
-4. Create three OAuth clients under **Credentials**:
-   - **iOS** — bundle ID `com.thelazybearclub.eventReminder`. Note the
-     client ID and the **iOS URL scheme** (reversed client ID,
-     `com.googleusercontent.apps.…`).
-   - **Android** — package
-     `com.the_lazy_bear_club.event_reminder` plus your debug SHA-1:
-
-     ```bash
-     keytool -list -v -keystore ~/.android/debug.keystore \
-       -alias androiddebugkey -storepass android -keypass android
-     ```
-
-     Later, add the release keystore SHA-1 the same way.
-   - **Web application** — its client ID is used as
-     `GOOGLE_SERVER_CLIENT_ID` (required by `google_sign_in` 7.x on Android).
-
-### 2. Local config files
-
-```bash
-cp google_oauth.example.json google_oauth.json
-cp ios/Flutter/GoogleOAuth.xcconfig.example ios/Flutter/GoogleOAuth.xcconfig
+```json
+{ "word": "TIGER", "category": "Animals", "hintText": "Big striped cat", "difficulty": "easy" }
 ```
 
-Fill both with your real IDs. Both files are gitignored.
+- `word`: 4–8 letters, A–Z only, no spaces. It is upper-cased on load.
+- `category`: shown in the chip above the slots.
+- `hintText` (optional): clue shown in the hint sheet.
+- `difficulty` (optional): `easy` | `medium` | `hard`. Defaults to `easy`.
 
-### 3. Run with OAuth
+Invalid entries fail an assert in debug builds and are skipped in release builds. `test/features/unscramble/word_list_test.dart` checks the whole file, so run `flutter test` after editing. Words are dealt without repeats until the deck runs out, then it reshuffles.
 
-```bash
-flutter run --dart-define-from-file=google_oauth.json
+## Architecture
+
+```
+lib/
+  main.dart / app.dart                 ProviderScope, SharedPreferences, theme
+  features/unscramble/
+    domain/models.dart                 LetterTile, GameStatus, UnscrambleGameState…
+    data/word_repository.dart          asset loader + WordDeck
+    application/unscramble_controller.dart   all game rules (Notifier)
+    presentation/                      HomeScreen, GameScreen, widgets/
+  shared/
+    sfx/sfx_player.dart                no-op sound hooks
+    prefs/preferences.dart             high score + coach-mark flag
+    theme/app_theme.dart               Material 3 light/dark + GameColors
 ```
 
-Or use the **Planly (with Google OAuth)** launch config in
-[`.vscode/launch.json`](.vscode/launch.json).
+`UnscrambleController` owns every rule. Widgets only call its methods. UI feedback (flashes, shakes, haptics) is driven by `state.lastEvent`, a one-shot event with an increasing `serial`.
 
-iOS also needs `GoogleOAuth.xcconfig` so `Info.plist` can expand
-`GIDClientID` and the reversed URL scheme.
-
-## Architecture notes
-
-- **State:** Riverpod · **Routing:** go_router · **Local DB:** Drift (SQLite)
-- Google auth + Calendar live under `lib/data/google/`; sync orchestration in
-  `lib/services/calendar_sync_service.dart` and
-  `lib/services/event_push_service.dart`.
-- See [`docs/planly_spec.md`](docs/planly_spec.md) for the full product spec.
+Monetization hooks are disabled stubs marked `TODO(monetization)` in the hint sheet and the lose dialog.

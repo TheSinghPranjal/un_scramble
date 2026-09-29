@@ -1,5 +1,0 @@
-// Copy to GoogleOAuth.xcconfig and fill in values from Google Cloud Console.
-// GOOGLE_REVERSED_CLIENT_ID is the iOS client's "iOS URL scheme"
-// (com.googleusercontent.apps.XXXX).
-GOOGLE_IOS_CLIENT_ID=YOUR_IOS_CLIENT_ID.apps.googleusercontent.com
-GOOGLE_REVERSED_CLIENT_ID=com.googleusercontent.apps.YOUR_IOS_CLIENT_ID

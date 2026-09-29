@@ -1,0 +1,368 @@
+[
+  {
+    "word": "TIGER",
+    "category": "Animals",
+    "hintText": "Big striped cat",
+    "difficulty": "easy"
+  },
+  {
+    "word": "ZEBRA",
+    "category": "Animals",
+    "hintText": "Striped horse of the savanna",
+    "difficulty": "easy"
+  },
+  {
+    "word": "RABBIT",
+    "category": "Animals",
+    "hintText": "Hops and loves carrots",
+    "difficulty": "easy"
+  },
+  {
+    "word": "PENGUIN",
+    "category": "Animals",
+    "hintText": "Bird that can't fly but swims",
+    "difficulty": "medium"
+  },
+  {
+    "word": "GIRAFFE",
+    "category": "Animals",
+    "hintText": "Tallest animal on land",
+    "difficulty": "medium"
+  },
+  {
+    "word": "DOLPHIN",
+    "category": "Animals",
+    "hintText": "Smart ocean mammal",
+    "difficulty": "medium"
+  },
+  {
+    "word": "OCTOPUS",
+    "category": "Animals",
+    "hintText": "Eight arms, three hearts",
+    "difficulty": "medium"
+  },
+  {
+    "word": "KANGAROO",
+    "category": "Animals",
+    "hintText": "Carries its baby in a pouch",
+    "difficulty": "hard"
+  },
+  {
+    "word": "HEDGEHOG",
+    "category": "Animals",
+    "hintText": "Small and spiky",
+    "difficulty": "hard"
+  },
+  {
+    "word": "PIZZA",
+    "category": "Food",
+    "hintText": "Cheesy slices from Italy",
+    "difficulty": "easy"
+  },
+  {
+    "word": "BREAD",
+    "category": "Food",
+    "hintText": "Baked from flour and yeast",
+    "difficulty": "easy"
+  },
+  {
+    "word": "APPLE",
+    "category": "Food",
+    "hintText": "Keeps the doctor away",
+    "difficulty": "easy"
+  },
+  {
+    "word": "MANGO",
+    "category": "Food",
+    "hintText": "Tropical king of fruits",
+    "difficulty": "easy"
+  },
+  {
+    "word": "CHEESE",
+    "category": "Food",
+    "hintText": "Made from milk, loved by mice",
+    "difficulty": "medium"
+  },
+  {
+    "word": "NOODLE",
+    "category": "Food",
+    "hintText": "Long, slurpable strand",
+    "difficulty": "medium"
+  },
+  {
+    "word": "PANCAKE",
+    "category": "Food",
+    "hintText": "Flat breakfast stack",
+    "difficulty": "medium"
+  },
+  {
+    "word": "AVOCADO",
+    "category": "Food",
+    "hintText": "Green fruit on toast",
+    "difficulty": "hard"
+  },
+  {
+    "word": "BISCUIT",
+    "category": "Food",
+    "hintText": "Crunchy tea-time snack",
+    "difficulty": "hard"
+  },
+  {
+    "word": "RIVER",
+    "category": "Nature",
+    "hintText": "Flowing freshwater",
+    "difficulty": "easy"
+  },
+  {
+    "word": "CLOUD",
+    "category": "Nature",
+    "hintText": "Floats in the sky",
+    "difficulty": "easy"
+  },
+  {
+    "word": "STORM",
+    "category": "Nature",
+    "hintText": "Thunder and lightning",
+    "difficulty": "easy"
+  },
+  {
+    "word": "FOREST",
+    "category": "Nature",
+    "hintText": "Lots of trees together",
+    "difficulty": "medium"
+  },
+  {
+    "word": "VOLCANO",
+    "category": "Nature",
+    "hintText": "Mountain that erupts",
+    "difficulty": "medium"
+  },
+  {
+    "word": "GLACIER",
+    "category": "Nature",
+    "hintText": "Slow river of ice",
+    "difficulty": "hard"
+  },
+  {
+    "word": "RAINBOW",
+    "category": "Nature",
+    "hintText": "Seven colours after rain",
+    "difficulty": "medium"
+  },
+  {
+    "word": "TENNIS",
+    "category": "Sports",
+    "hintText": "Rackets and a net",
+    "difficulty": "easy"
+  },
+  {
+    "word": "SOCCER",
+    "category": "Sports",
+    "hintText": "The beautiful game",
+    "difficulty": "easy"
+  },
+  {
+    "word": "HOCKEY",
+    "category": "Sports",
+    "hintText": "Played on ice or grass",
+    "difficulty": "medium"
+  },
+  {
+    "word": "CRICKET",
+    "category": "Sports",
+    "hintText": "Bat, ball and wickets",
+    "difficulty": "medium"
+  },
+  {
+    "word": "BOXING",
+    "category": "Sports",
+    "hintText": "Gloves in the ring",
+    "difficulty": "medium"
+  },
+  {
+    "word": "MARATHON",
+    "category": "Sports",
+    "hintText": "A very long run",
+    "difficulty": "hard"
+  },
+  {
+    "word": "PIANO",
+    "category": "Music",
+    "hintText": "Black and white keys",
+    "difficulty": "easy"
+  },
+  {
+    "word": "DRUM",
+    "category": "Music",
+    "hintText": "You hit it to keep the beat",
+    "difficulty": "easy"
+  },
+  {
+    "word": "GUITAR",
+    "category": "Music",
+    "hintText": "Six strings",
+    "difficulty": "easy"
+  },
+  {
+    "word": "VIOLIN",
+    "category": "Music",
+    "hintText": "Played with a bow",
+    "difficulty": "medium"
+  },
+  {
+    "word": "MELODY",
+    "category": "Music",
+    "hintText": "A tune you can hum",
+    "difficulty": "medium"
+  },
+  {
+    "word": "TRUMPET",
+    "category": "Music",
+    "hintText": "Brass horn with valves",
+    "difficulty": "medium"
+  },
+  {
+    "word": "PLANET",
+    "category": "Space",
+    "hintText": "Orbits a star",
+    "difficulty": "easy"
+  },
+  {
+    "word": "COMET",
+    "category": "Space",
+    "hintText": "Icy visitor with a tail",
+    "difficulty": "easy"
+  },
+  {
+    "word": "ROCKET",
+    "category": "Space",
+    "hintText": "Blasts off into orbit",
+    "difficulty": "easy"
+  },
+  {
+    "word": "GALAXY",
+    "category": "Space",
+    "hintText": "Billions of stars together",
+    "difficulty": "medium"
+  },
+  {
+    "word": "ASTEROID",
+    "category": "Space",
+    "hintText": "Rocky space debris",
+    "difficulty": "hard"
+  },
+  {
+    "word": "NEBULA",
+    "category": "Space",
+    "hintText": "Cloud where stars are born",
+    "difficulty": "hard"
+  },
+  {
+    "word": "LAMP",
+    "category": "Home",
+    "hintText": "Lights up a room",
+    "difficulty": "easy"
+  },
+  {
+    "word": "PILLOW",
+    "category": "Home",
+    "hintText": "Soft place for your head",
+    "difficulty": "easy"
+  },
+  {
+    "word": "MIRROR",
+    "category": "Home",
+    "hintText": "Shows your reflection",
+    "difficulty": "easy"
+  },
+  {
+    "word": "KITCHEN",
+    "category": "Home",
+    "hintText": "Where meals are cooked",
+    "difficulty": "medium"
+  },
+  {
+    "word": "BLANKET",
+    "category": "Home",
+    "hintText": "Keeps you warm in bed",
+    "difficulty": "medium"
+  },
+  {
+    "word": "CUPBOARD",
+    "category": "Home",
+    "hintText": "Storage for dishes",
+    "difficulty": "hard"
+  },
+  {
+    "word": "TRAIN",
+    "category": "Travel",
+    "hintText": "Runs on rails",
+    "difficulty": "easy"
+  },
+  {
+    "word": "TICKET",
+    "category": "Travel",
+    "hintText": "Your pass to board",
+    "difficulty": "easy"
+  },
+  {
+    "word": "PASSPORT",
+    "category": "Travel",
+    "hintText": "Needed to cross borders",
+    "difficulty": "hard"
+  },
+  {
+    "word": "LUGGAGE",
+    "category": "Travel",
+    "hintText": "Bags for a trip",
+    "difficulty": "medium"
+  },
+  {
+    "word": "AIRPORT",
+    "category": "Travel",
+    "hintText": "Where planes take off",
+    "difficulty": "medium"
+  },
+  {
+    "word": "COMPASS",
+    "category": "Travel",
+    "hintText": "Always points north",
+    "difficulty": "medium"
+  },
+  {
+    "word": "ISLAND",
+    "category": "Travel",
+    "hintText": "Land surrounded by water",
+    "difficulty": "medium"
+  },
+  {
+    "word": "CASTLE",
+    "category": "Places",
+    "hintText": "Home of kings and queens",
+    "difficulty": "easy"
+  },
+  {
+    "word": "MUSEUM",
+    "category": "Places",
+    "hintText": "Where history is displayed",
+    "difficulty": "medium"
+  },
+  {
+    "word": "LIBRARY",
+    "category": "Places",
+    "hintText": "Full of books to borrow",
+    "difficulty": "medium"
+  },
+  {
+    "word": "HOSPITAL",
+    "category": "Places",
+    "hintText": "Where doctors work",
+    "difficulty": "hard"
+  },
+  {
+    "word": "BRIDGE",
+    "category": "Places",
+    "hintText": "Crosses a river",
+    "difficulty": "easy"
+  }
+]

@@ -43,8 +43,3 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-
-# Google OAuth secrets (copy from *.example files)
-/google_oauth.json
-/ios/Flutter/GoogleOAuth.xcconfig
-

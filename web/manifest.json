@@ -1,6 +1,6 @@
 {
-    "name": "event_reminder",
-    "short_name": "event_reminder",
+    "name": "un_scramble",
+    "short_name": "un_scramble",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
