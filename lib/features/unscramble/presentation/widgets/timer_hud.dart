@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../shared/theme/app_theme.dart';
+import '../../../../shared/theme/art_palette.dart';
 import '../../application/unscramble_controller.dart';
 
 /// Circular countdown ring with mm:ss. Turns amber and pulses under 30s,
 /// red with a stronger pulse under 10s.
 class TimerHud extends ConsumerWidget {
-  const TimerHud({super.key, this.size = 72});
+  const TimerHud({super.key, this.size = 80});
 
   final double size;
 
@@ -25,7 +27,7 @@ class TimerHud extends ConsumerWidget {
     final color = switch (phase) {
       2 => scheme.error,
       1 => game.warning,
-      _ => scheme.primary,
+      _ => ArtPalette.purple,
     };
     final label =
         '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
@@ -38,23 +40,25 @@ class TimerHud extends ConsumerWidget {
           DecoratedBox(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: scheme.surfaceContainerLowest,
+              color: Colors.white,
+              border: Border.all(color: Colors.white, width: 3),
               boxShadow: [
                 BoxShadow(
-                  color: color.withValues(alpha: 0.25),
-                  blurRadius: phase == 0 ? 8 : 16,
+                  color: color.withValues(alpha: phase == 0 ? 0.3 : 0.45),
+                  blurRadius: phase == 0 ? 14 : 20,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(5),
+            padding: const EdgeInsets.all(6),
             child: TweenAnimationBuilder<double>(
               tween: Tween(end: progress),
               duration: const Duration(milliseconds: 900),
               builder: (context, value, _) => CircularProgressIndicator(
                 value: value,
-                strokeWidth: 6,
+                strokeWidth: 8,
                 strokeCap: StrokeCap.round,
                 color: color,
                 backgroundColor: color.withValues(alpha: 0.15),
@@ -64,8 +68,10 @@ class TimerHud extends ConsumerWidget {
           Center(
             child: Text(
               label,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: color,
+              style: GoogleFonts.fredoka(
+                fontSize: size * 0.3,
+                fontWeight: FontWeight.w700,
+                color: phase == 0 ? ArtPalette.purpleDeep : color,
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),

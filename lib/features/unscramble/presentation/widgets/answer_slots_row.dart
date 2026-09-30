@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/theme/app_theme.dart';
+import '../../../../shared/theme/art_palette.dart';
 import '../../application/unscramble_controller.dart';
 import '../../domain/models.dart';
 import 'letter_tile_face.dart';
@@ -212,20 +213,21 @@ class _EmptySlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final radius = width < 44 ? 12.0 : 16.0;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 120),
       decoration: BoxDecoration(
         color: hovering
-            ? scheme.primaryContainer.withValues(alpha: 0.7)
-            : scheme.surfaceContainerLowest.withValues(alpha: 0.55),
+            ? ArtPalette.lavenderDeep.withValues(alpha: 0.8)
+            : Colors.white.withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(radius),
-        border: hovering ? Border.all(color: scheme.primary, width: 2.5) : null,
+        border: hovering
+            ? Border.all(color: ArtPalette.purple, width: 2.5)
+            : null,
         boxShadow: hovering
             ? [
                 BoxShadow(
-                  color: scheme.primary.withValues(alpha: 0.45),
+                  color: ArtPalette.purple.withValues(alpha: 0.45),
                   blurRadius: 16,
                   spreadRadius: 1,
                 ),
@@ -236,7 +238,7 @@ class _EmptySlot extends StatelessWidget {
           ? null
           : CustomPaint(
               painter: DashedRRectPainter(
-                color: scheme.outline,
+                color: ArtPalette.slotDash,
                 radius: radius,
               ),
             ),

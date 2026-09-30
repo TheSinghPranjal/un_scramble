@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../shared/theme/art_palette.dart';
+
 enum TileTone {
   /// Loose letter in the tray.
   tray,
@@ -34,22 +36,25 @@ class LetterTileFace extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final radius = BorderRadius.circular(width < 44 ? 12 : 16);
-    final lipDepth = width < 44 ? 3.0 : 4.0;
+    final radius = BorderRadius.circular(width < 44 ? 12 : 18);
+    final lipDepth = width < 44 ? 3.0 : 5.0;
 
-    final (Color face, Color lip, Color text) = switch (tone) {
+    final (Color face, Color faceTop, Color lip, Color text) = switch (tone) {
       TileTone.tray => (
-        scheme.surfaceContainerLowest,
-        scheme.outlineVariant,
-        scheme.onSurface,
+        ArtPalette.lavender,
+        Colors.white,
+        ArtPalette.tileLip,
+        ArtPalette.ink,
       ),
       TileTone.locked => (
-        scheme.primary,
-        _darken(scheme.primary),
-        scheme.onPrimary,
+        ArtPalette.purple,
+        ArtPalette.purpleLight,
+        ArtPalette.purpleDeep,
+        Colors.white,
       ),
       TileTone.ghost => (
-        scheme.surfaceContainerHighest.withValues(alpha: 0.45),
+        ArtPalette.lavenderDeep.withValues(alpha: 0.45),
+        ArtPalette.lavenderDeep.withValues(alpha: 0.45),
         Colors.transparent,
         Colors.transparent,
       ),
@@ -60,12 +65,23 @@ class LetterTileFace extends StatelessWidget {
       height: height,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: face,
+          // Lighter top edge gives the glossy "candy" tile look.
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [faceTop, face],
+          ),
           borderRadius: radius,
           boxShadow: [
             // Solid "lip" under the tile gives the chunky, pressable look.
             if (tone != TileTone.ghost)
               BoxShadow(color: lip, offset: Offset(0, lipDepth)),
+            if (tone == TileTone.tray)
+              BoxShadow(
+                color: ArtPalette.purple.withValues(alpha: 0.12),
+                blurRadius: 12,
+                offset: Offset(0, lipDepth + 4),
+              ),
             if (lifted)
               BoxShadow(
                 color: scheme.shadow.withValues(alpha: 0.28),
@@ -88,6 +104,4 @@ class LetterTileFace extends StatelessWidget {
       ),
     );
   }
-
-  static Color _darken(Color c) => Color.lerp(c, Colors.black, 0.28) ?? c;
 }

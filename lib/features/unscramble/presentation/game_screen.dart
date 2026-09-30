@@ -4,18 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../shared/prefs/preferences.dart';
-import '../../../shared/theme/app_theme.dart';
+import '../../../shared/theme/art_palette.dart';
 import '../application/unscramble_controller.dart';
 import '../domain/models.dart';
 import 'widgets/answer_slots_row.dart';
+import 'widgets/art_decor.dart';
 import 'widgets/coach_marks.dart';
 import 'widgets/hint_widgets.dart';
 import 'widgets/letter_tray.dart';
 import 'widgets/result_dialog.dart';
 import 'widgets/timer_hud.dart';
 import 'widgets/unscramble_life_bar.dart';
+
+/// Game artwork: pastel sky with cloud banks along the edges.
+const _backgroundAsset = 'assets/images/game_background.png';
 
 class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
@@ -150,23 +155,24 @@ class _GameScreenState extends ConsumerState<GameScreen>
   @override
   Widget build(BuildContext context) {
     ref.listen(unscrambleControllerProvider, _onStateChanged);
-    final colors = GameColors.of(context);
     final status = ref.watch(
       unscrambleControllerProvider.select((s) => s.status),
     );
 
-    return Scaffold(
-      floatingActionButton: const HintButton(),
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [colors.backgroundTop, colors.backgroundBottom],
-          ),
-        ),
-        child: Stack(
+    return Theme(
+      data: ArtPalette.theme,
+      child: Scaffold(
+        floatingActionButton: const HintButton(),
+        body: Stack(
+          fit: StackFit.expand,
           children: [
+            Image.asset(
+              _backgroundAsset,
+              fit: BoxFit.cover,
+              alignment: Alignment.bottomCenter,
+              excludeFromSemantics: true,
+            ),
+            const _BackgroundStars(),
             SafeArea(
               child: status == GameStatus.idle
                   ? const Center(child: CircularProgressIndicator())
@@ -200,6 +206,36 @@ class _GameScreenState extends ConsumerState<GameScreen>
   }
 }
 
+/// Stars floating over the painted clouds, placed as fractions of the screen
+/// so they sit on the cloud banks at any size. Drawn behind the game UI.
+class _BackgroundStars extends StatelessWidget {
+  const _BackgroundStars();
+
+  static const _stars = [
+    // (x, y, size, tilt) — x/y are fractions of the screen.
+    (0.14, 0.27, 44.0, -0.04),
+    (0.84, 0.32, 32.0, 0.06),
+    (0.10, 0.81, 50.0, 0.03),
+    (0.82, 0.90, 42.0, -0.05),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) => Stack(
+        children: [
+          for (final (x, y, size, turns) in _stars)
+            Positioned(
+              left: constraints.maxWidth * x - size / 2,
+              top: constraints.maxHeight * y - size / 2,
+              child: ArtStar(size: size, turns: turns),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class _GameBody extends StatelessWidget {
   const _GameBody({required this.slotsKey, required this.trayKey});
 
@@ -208,19 +244,18 @@ class _GameBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         const Padding(
-          padding: EdgeInsets.fromLTRB(4, 8, 16, 0),
+          padding: EdgeInsets.fromLTRB(8, 8, 16, 0),
           child: _TopBar(),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 12),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 16),
           child: UnscrambleLifeBar(),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         const _CategoryChip(),
         Expanded(
           flex: 5,
@@ -229,7 +264,12 @@ class _GameBody extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                KeyedSubtree(key: slotsKey, child: const AnswerSlotsRow()),
+                _SlotsCard(
+                  child: KeyedSubtree(
+                    key: slotsKey,
+                    child: const AnswerSlotsRow(),
+                  ),
+                ),
                 const SizedBox(height: 16),
                 const _InstructionLine(),
               ],
@@ -240,19 +280,30 @@ class _GameBody extends StatelessWidget {
           flex: 6,
           child: Container(
             width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: scheme.surfaceContainer.withValues(alpha: 0.7),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.white.withValues(alpha: 0.6),
+                  Colors.white.withValues(alpha: 0.15),
+                ],
+              ),
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(32),
+                top: Radius.circular(36),
+              ),
+              border: Border(
+                top: BorderSide(color: Colors.white.withValues(alpha: 0.8)),
               ),
             ),
             child: SingleChildScrollView(
               // Extra bottom padding keeps tiles clear of the hint FAB.
-              padding: const EdgeInsets.fromLTRB(16, 28, 16, 88),
+              padding: const EdgeInsets.fromLTRB(16, 32, 16, 88),
               child: Column(
                 children: [
                   KeyedSubtree(key: trayKey, child: const LetterTray()),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 28),
                   const _ShuffleButton(),
                 ],
               ),
@@ -264,12 +315,47 @@ class _GameBody extends StatelessWidget {
   }
 }
 
+/// Frosted panel behind the answer slots, with yellow "pop" rays on its top
+/// corners.
+class _SlotsCard extends StatelessWidget {
+  const _SlotsCard({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.8)),
+            boxShadow: [
+              BoxShadow(
+                color: ArtPalette.purple.withValues(alpha: 0.08),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: child,
+        ),
+        const Positioned(left: -18, top: -20, child: SparkRays(mirrored: true)),
+        const Positioned(right: -18, top: -20, child: SparkRays()),
+      ],
+    );
+  }
+}
+
 class _TopBar extends ConsumerWidget {
   const _TopBar();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final round = ref.watch(
       unscrambleControllerProvider.select((s) => s.roundIndex),
     );
@@ -280,23 +366,31 @@ class _TopBar extends ConsumerWidget {
       children: [
         IconButton(
           tooltip: 'Home',
+          color: ArtPalette.ink,
+          iconSize: 30,
           icon: const Icon(Icons.close_rounded),
           onPressed: () => Navigator.maybePop(context),
         ),
+        const SizedBox(width: 4),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Unscramble',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: theme.colorScheme.primary,
-                  letterSpacing: 1.2,
+                style: GoogleFonts.fredoka(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: ArtPalette.purple,
                 ),
               ),
               Text(
                 'Round $round · $score pts',
-                style: theme.textTheme.titleMedium,
+                style: GoogleFonts.nunito(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: ArtPalette.ink,
+                ),
               ),
             ],
           ),
@@ -312,7 +406,6 @@ class _CategoryChip extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final category = ref.watch(
       unscrambleControllerProvider.select((s) => s.category),
     );
@@ -323,15 +416,17 @@ class _CategoryChip extends ConsumerWidget {
       unscrambleControllerProvider.select((s) => s.targetWord.length),
     );
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 8),
       decoration: BoxDecoration(
-        color: theme.colorScheme.secondaryContainer,
+        color: ArtPalette.lavenderDeep.withValues(alpha: 0.75),
         borderRadius: BorderRadius.circular(100),
       ),
       child: Text(
         '$category · ${difficulty.label} · $length letters',
-        style: theme.textTheme.labelLarge?.copyWith(
-          color: theme.colorScheme.onSecondaryContainer,
+        style: GoogleFonts.nunito(
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          color: ArtPalette.ink.withValues(alpha: 0.8),
         ),
       ),
     );
@@ -346,14 +441,15 @@ class _InstructionLine extends ConsumerWidget {
     final hidden = ref.watch(
       unscrambleControllerProvider.select((s) => s.hasPlacedAnyLetter),
     );
-    final theme = Theme.of(context);
     return AnimatedOpacity(
       opacity: hidden ? 0 : 1,
       duration: const Duration(milliseconds: 300),
       child: Text(
         'Drag letters into the slots',
-        style: theme.textTheme.bodyMedium?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
+        style: GoogleFonts.nunito(
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+          color: ArtPalette.muted,
         ),
       ).animate().fadeIn(delay: 300.ms),
     );
@@ -374,8 +470,20 @@ class _ShuffleButton extends ConsumerWidget {
       onPressed: enabled
           ? ref.read(unscrambleControllerProvider.notifier).shuffleTray
           : null,
-      icon: const Icon(Icons.shuffle_rounded),
+      icon: const Icon(Icons.shuffle_rounded, size: 28),
       label: const Text('Shuffle'),
+      style: TextButton.styleFrom(
+        foregroundColor: ArtPalette.purple,
+        disabledForegroundColor: ArtPalette.muted,
+        backgroundColor: ArtPalette.lavenderDeep.withValues(alpha: 0.75),
+        disabledBackgroundColor: ArtPalette.lavenderDeep.withValues(alpha: 0.4),
+        shape: const StadiumBorder(),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+        textStyle: GoogleFonts.fredoka(
+          fontSize: 20,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
     );
   }
 }

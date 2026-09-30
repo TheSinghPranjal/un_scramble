@@ -2,6 +2,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../../../shared/theme/art_palette.dart';
 
 import '../../application/unscramble_controller.dart';
 import '../../domain/models.dart';
@@ -34,8 +37,9 @@ class LifeBarView extends StatelessWidget {
         builder: (context, constraints) {
           const gap = 4.0;
           final size = math.min(
-            34.0,
-            (constraints.maxWidth - gap * (kMaxLives - 1)) / kMaxLives,
+            38.0,
+            ((constraints.maxWidth - gap * (kMaxLives - 1)) / kMaxLives)
+                .floorToDouble(),
           );
           return Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -90,15 +94,14 @@ class _LifeChipState extends State<LifeChip>
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final alive = widget.alive;
-    final textStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
-      fontSize: widget.size * 0.52,
+    final textStyle = GoogleFonts.fredoka(
+      fontSize: widget.size * 0.55,
       height: 1,
-      fontWeight: alive ? FontWeight.w800 : FontWeight.w500,
-      color: alive ? scheme.onPrimary : scheme.outline,
+      fontWeight: alive ? FontWeight.w700 : FontWeight.w500,
+      color: alive ? Colors.white : ArtPalette.muted,
       decoration: alive ? TextDecoration.none : TextDecoration.lineThrough,
-      decorationColor: scheme.error,
+      decorationColor: ArtPalette.heart,
       decorationThickness: 2.5,
     );
 
@@ -108,13 +111,25 @@ class _LifeChipState extends State<LifeChip>
       width: widget.size,
       height: widget.size * 1.15,
       decoration: BoxDecoration(
-        color: alive ? scheme.primary : scheme.surfaceContainerHighest,
+        // Lighter top edge matches the glossy letter tiles.
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: alive
+              ? const [ArtPalette.purpleLight, ArtPalette.purple]
+              : const [ArtPalette.lavender, ArtPalette.lavenderDeep],
+        ),
         borderRadius: BorderRadius.circular(widget.size * 0.3),
         boxShadow: alive
             ? [
+                const BoxShadow(
+                  color: ArtPalette.purpleDeep,
+                  offset: Offset(0, 3),
+                ),
                 BoxShadow(
-                  color: Color.lerp(scheme.primary, Colors.black, 0.3)!,
-                  offset: const Offset(0, 2.5),
+                  color: ArtPalette.purple.withValues(alpha: 0.25),
+                  blurRadius: 8,
+                  offset: const Offset(0, 5),
                 ),
               ]
             : null,
