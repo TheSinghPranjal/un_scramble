@@ -12,6 +12,7 @@ class UnscrambleApp extends StatelessWidget {
       title: 'Unscramble',
 
       debugShowCheckedModeBanner: false,
+
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       home: const HomeScreen(),
