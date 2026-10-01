@@ -13,6 +13,7 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
 
   runApp(
+
     ProviderScope(
       overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
       child: const UnscrambleApp(),
