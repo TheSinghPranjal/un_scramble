@@ -12,7 +12,7 @@ import '../../domain/models.dart';
 import 'letter_tile_face.dart';
 import 'shake.dart';
 
-/// The hero row of answer slots. Scrolls horizontally when the word is too
+/// The hero row of answer slots. Wraps onto extra lines when the word is too
 /// long to fit at a comfortable size (small phones, 7–8 letter words).
 class AnswerSlotsRow extends ConsumerWidget {
   const AnswerSlotsRow({super.key});
@@ -40,36 +40,50 @@ class AnswerSlotsRow extends ConsumerWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final fitWidth = (constraints.maxWidth - _gap * (n - 1)) / n;
-        final scrolls = fitWidth < _minWidth;
-        final width = scrolls ? 48.0 : math.min(_maxWidth, fitWidth);
+        final maxWidth = constraints.maxWidth;
+        // How many slots fit on one line at the minimum size, then spread the
+        // word evenly across as few lines as needed (e.g. 4 + 4, not 7 + 1).
+        final maxPerLine = math.max(
+          1,
+          ((maxWidth + _gap) / (_minWidth + _gap)).floor(),
+        );
+        final lines = (n / maxPerLine).ceil();
+        final perLine = (n / lines).ceil();
+        final fitWidth = (maxWidth - _gap * (perLine - 1)) / perLine;
+        final width = math.min(_maxWidth, fitWidth);
         final height = math.max(56.0, width * 1.15);
 
-        final row = Row(
+        Widget slot(int i) => AnswerSlot(
+          index: i,
+          letter: slots[i],
+          width: width,
+          height: height,
+          canAccept: playing,
+          event: lastEvent?.slotIndex == i ? lastEvent : null,
+          onDrop: (tile) =>
+              controller.onLetterDropped(tile: tile, slotIndex: i),
+        );
+
+        return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            for (var i = 0; i < n; i++) ...[
-              if (i > 0) const SizedBox(width: _gap),
-              AnswerSlot(
-                index: i,
-                letter: slots[i],
-                width: width,
-                height: height,
-                canAccept: playing,
-                event: lastEvent?.slotIndex == i ? lastEvent : null,
-                onDrop: (tile) =>
-                    controller.onLetterDropped(tile: tile, slotIndex: i),
+            for (var line = 0; line < lines; line++) ...[
+              if (line > 0) const SizedBox(height: _gap * 2),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (
+                    var i = line * perLine;
+                    i < math.min(n, (line + 1) * perLine);
+                    i++
+                  ) ...[
+                    if (i > line * perLine) const SizedBox(width: _gap),
+                    slot(i),
+                  ],
+                ],
               ),
             ],
           ],
-        );
-
-        if (!scrolls) return Center(child: row);
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          clipBehavior: Clip.none,
-          child: row,
         );
       },
     );

@@ -261,18 +261,30 @@ class _GameBody extends StatelessWidget {
           flex: 5,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _SlotsCard(
-                  child: KeyedSubtree(
-                    key: slotsKey,
-                    child: const AnswerSlotsRow(),
+            // Long words wrap onto a second line of slots; on short screens
+            // shrink the whole block rather than overflowing.
+            child: LayoutBuilder(
+              builder: (context, constraints) => Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: SizedBox(
+                    width: constraints.maxWidth,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _SlotsCard(
+                          child: KeyedSubtree(
+                            key: slotsKey,
+                            child: const AnswerSlotsRow(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const _InstructionLine(),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                const _InstructionLine(),
-              ],
+              ),
             ),
           ),
         ),
