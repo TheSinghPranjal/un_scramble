@@ -7,6 +7,7 @@ final sharedPreferencesProvider = Provider<SharedPreferences>(
       throw UnimplementedError('sharedPreferencesProvider must be overridden'),
 );
 
+
 class HighScoreNotifier extends Notifier<int> {
   static const _key = 'high_score';
 
