@@ -42,12 +42,17 @@ class HintSheet extends StatelessWidget {
     required this.category,
     required this.clue,
     required this.onReveal,
+    required this.onWatchAd,
     required this.onNoThanks,
   });
 
   final String category;
   final String? clue;
   final VoidCallback onReveal;
+
+  /// Shows a rewarded ad. Returns true only when the reward was earned.
+  /// The sheet closes itself on success; a false result stays open.
+  final Future<bool> Function() onWatchAd;
   final VoidCallback onNoThanks;
 
   @override
@@ -109,17 +114,77 @@ class HintSheet extends StatelessWidget {
               label: const Text('Reveal a letter'),
             ),
             const SizedBox(height: 8),
-            // TODO(monetization): wire to a rewarded ad for an extra hint.
-            OutlinedButton.icon(
-              onPressed: null,
-              icon: const Icon(Icons.ondemand_video_rounded),
-              label: const Text('Watch ad for extra hint · Coming soon'),
-            ),
+            _WatchAdButton(onWatch: onWatchAd),
             const SizedBox(height: 4),
             TextButton(onPressed: onNoThanks, child: const Text('No thanks')),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _WatchAdButton extends StatefulWidget {
+  const _WatchAdButton({required this.onWatch});
+
+  final Future<bool> Function() onWatch;
+
+  @override
+  State<_WatchAdButton> createState() => _WatchAdButtonState();
+}
+
+class _WatchAdButtonState extends State<_WatchAdButton> {
+  bool _busy = false;
+  bool _unavailable = false;
+
+  Future<void> _press() async {
+    if (_busy) return;
+    setState(() {
+      _busy = true;
+      _unavailable = false;
+    });
+    var earned = false;
+    try {
+      earned = await widget.onWatch();
+    } catch (error) {
+      debugPrint('AdMob rewarded show failed: code=exception message=$error');
+      earned = false;
+    }
+    if (!mounted) return;
+    if (earned) {
+      Navigator.pop(context);
+      return;
+    }
+    setState(() {
+      _busy = false;
+      _unavailable = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        OutlinedButton.icon(
+          onPressed: _busy ? null : _press,
+          icon: _busy
+              ? const SizedBox.square(
+                  dimension: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.ondemand_video_rounded),
+          label: const Text('Watch ad for an extra letter'),
+        ),
+        if (_unavailable) ...[
+          const SizedBox(height: 8),
+          Text(
+            "Ad isn't available right now. You can keep playing.",
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
+      ],
     );
   }
 }

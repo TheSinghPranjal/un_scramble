@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../shared/ads/privacy_options_button.dart';
 import '../../../shared/prefs/preferences.dart';
 import '../../../shared/theme/art_palette.dart';
 import '../application/unscramble_controller.dart';
@@ -136,6 +137,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 ],
                               ),
                             ),
+                            const PrivacyOptionsButton(),
                           ],
                         ),
                       ),

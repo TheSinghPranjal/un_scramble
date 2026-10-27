@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../shared/ads/ad_providers.dart';
 import '../../../shared/prefs/preferences.dart';
 import '../../../shared/theme/art_palette.dart';
 import '../application/unscramble_controller.dart';
@@ -119,11 +120,26 @@ class _GameScreenState extends ConsumerState<GameScreen>
           Navigator.pop(sheetContext);
           _controller.useHint();
         },
+        onWatchAd: () async {
+          final earned = await ref.read(adServiceProvider).showRewarded();
+          if (!earned || !mounted) return false;
+          _controller.useRewardedHint();
+          return true;
+        },
         onNoThanks: () => Navigator.pop(sheetContext),
       ),
     );
     // Any close path (button, swipe, barrier tap, back) resumes the round.
     if (mounted) _controller.dismissHintSheet();
+  }
+
+  /// Closes the result dialog, offers an interstitial if one is ready, then
+  /// continues. A missing ad does not delay the next round.
+  Future<void> _continueAfterBreak(FutureOr<void> Function() action) async {
+    Navigator.pop(context);
+    await ref.read(interstitialAdManagerProvider).onNaturalBreak();
+    if (!mounted) return;
+    await action();
   }
 
   Future<void> _showResult() async {
@@ -138,16 +154,25 @@ class _GameScreenState extends ConsumerState<GameScreen>
       context,
       state: state,
       onNext: () {
-        Navigator.pop(context);
-        _controller.nextRound();
+        unawaited(_continueAfterBreak(_controller.nextRound));
       },
       onRetry: () {
-        Navigator.pop(context);
-        _controller.retryRound();
+        unawaited(_continueAfterBreak(_controller.retryRound));
       },
       onHome: () {
         Navigator.pop(context); // dialog
         Navigator.pop(context); // game screen
+      },
+      onRewardedContinue: () async {
+        final earned = await ref.read(adServiceProvider).showRewarded();
+        if (!earned || !mounted) return false;
+        final status = ref.read(unscrambleControllerProvider).status;
+        if (status == GameStatus.lostLives) {
+          _controller.grantRewardedLife();
+        } else if (status == GameStatus.lostTimeout) {
+          _controller.grantRewardedTime();
+        }
+        return true;
       },
     );
   }

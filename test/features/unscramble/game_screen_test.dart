@@ -15,9 +15,13 @@ void main() {
 
   UnscrambleGameState state() => container.read(unscrambleControllerProvider);
 
-  Future<void> pumpGame(WidgetTester tester, String word) async {
-    // Small phone: 360 x 690 dp.
-    tester.view.physicalSize = const Size(1080, 2070);
+  Future<void> pumpGame(
+    WidgetTester tester,
+    String word, {
+    Size size = const Size(1080, 2070),
+  }) async {
+    // Default is a small phone: 360 x 690 dp.
+    tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
@@ -103,6 +107,10 @@ void main() {
     expect(state().status, GameStatus.pausedForHint);
     await tester.pump(const Duration(milliseconds: 600));
     expect(find.text('Need a hint?'), findsOneWidget);
+    final watchAd = tester.widget<OutlinedButton>(
+      find.widgetWithText(OutlinedButton, 'Watch ad for an extra letter'),
+    );
+    expect(watchAd.onPressed, isNotNull);
 
     await tester.tap(find.text('Reveal a letter'));
     await tester.pump(const Duration(milliseconds: 600));
@@ -116,6 +124,14 @@ void main() {
     tester,
   ) async {
     await pumpGame(tester, 'KANGAROO');
+    expect(tester.takeException(), isNull);
+    expect(find.byType(AnswerSlot), findsNWidgets(8));
+  });
+
+  testWidgets('8-letter word still fits above a banner', (tester) async {
+    // 360 x 600 logical pixels: the app shell reserves ~50dp for the banner
+    // plus a little system inset, so the board has less than the 690dp phone.
+    await pumpGame(tester, 'KANGAROO', size: const Size(1080, 1800));
     expect(tester.takeException(), isNull);
     expect(find.byType(AnswerSlot), findsNWidgets(8));
   });

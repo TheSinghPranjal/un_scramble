@@ -1,11 +1,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- google_fonts downloads fonts on first launch, then caches them. -->
+    <!-- AdMob, UMP consent, and google_fonts (downloaded once, then cached). -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
     <application
         android:label="Unscramble"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <!-- Release app id comes from config/admob.json. Debug and profile
+             keep Google's test app id. See android/app/build.gradle.kts. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="${admobAppId}" />
+        <meta-data
+            android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION"
+            android:value="true" />
+        <meta-data
+            android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING"
+            android:value="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -1,0 +1,11 @@
+{
+  "_comment": "Android ids are the production AdMob units for publisher pub-8661918790125012. iOS values are TODO placeholders and are not used for Android release builds. Debug and profile builds ignore these unit ids and use Google's test ids.",
+  "ADMOB_ANDROID_APP_ID": "ca-app-pub-8661918790125012~3957171192",
+  "ADMOB_ANDROID_BANNER_ID": "ca-app-pub-8661918790125012/7856761447",
+  "ADMOB_ANDROID_INTERSTITIAL_ID": "ca-app-pub-8661918790125012/9499026503",
+  "ADMOB_ANDROID_REWARDED_ID": "ca-app-pub-8661918790125012/3670230734",
+  "ADMOB_IOS_APP_ID": "TODO_IOS_APP_ID",
+  "ADMOB_IOS_BANNER_ID": "TODO_IOS_BANNER_ID",
+  "ADMOB_IOS_INTERSTITIAL_ID": "TODO_IOS_INTERSTITIAL_ID",
+  "ADMOB_IOS_REWARDED_ID": "TODO_IOS_REWARDED_ID"
+}
