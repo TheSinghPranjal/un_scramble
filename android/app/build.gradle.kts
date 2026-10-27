@@ -98,6 +98,8 @@ android {
                 signingConfigs.getByName("debug")
             }
             manifestPlaceholders["admobAppId"] = releaseAdmobAppId
+            isMinifyEnabled = true
+            isShrinkResources = true
         }
     }
 }
@@ -117,4 +119,9 @@ afterEvaluate {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // enableEdgeToEdge() in MainActivity.
+    implementation("androidx.activity:activity:1.12.4")
 }
