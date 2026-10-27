@@ -131,6 +131,7 @@ class UnscrambleController extends Notifier<UnscrambleGameState> {
       secondsRemaining: kRoundSeconds,
       hintUnlocked: false,
       hintUsed: false,
+      rewardedHintUsed: false,
       hintSheetShownThisRound: false,
       status: GameStatus.playing,
       clearLastEvent: true,
@@ -222,6 +223,48 @@ class UnscrambleController extends Notifier<UnscrambleGameState> {
   void dismissHintSheet() {
     if (state.status != GameStatus.pausedForHint) return;
     state = state.copyWith(status: GameStatus.playing);
+    _syncTicker();
+  }
+
+  /// One extra letter from a rewarded ad. Does not spend the free hint.
+  void useRewardedHint() {
+    if (state.rewardedHintUsed) return;
+    final status = state.status;
+    if (status != GameStatus.playing && status != GameStatus.pausedForHint) {
+      return;
+    }
+    final index = state.firstEmptySlot;
+    if (index < 0) return;
+    final expected = state.targetWord[index];
+    LetterTile? tile;
+    for (final candidate in state.tray) {
+      if (candidate.char == expected) {
+        tile = candidate;
+        break;
+      }
+    }
+    if (tile == null) return;
+    state = state.copyWith(rewardedHintUsed: true);
+    _place(tile: tile, slotIndex: index, type: GameEventType.hint);
+  }
+
+  /// Restores one life after a rewarded ad and resumes the same board.
+  void grantRewardedLife() {
+    if (state.status != GameStatus.lostLives) return;
+    state = state.copyWith(
+      livesRemaining: state.livesRemaining + 1,
+      status: GameStatus.playing,
+    );
+    _syncTicker();
+  }
+
+  /// Adds [seconds] after a timeout rewarded ad and resumes the same board.
+  void grantRewardedTime([int seconds = kRewardedExtraSeconds]) {
+    if (state.status != GameStatus.lostTimeout || seconds <= 0) return;
+    state = state.copyWith(
+      secondsRemaining: state.secondsRemaining + seconds,
+      status: GameStatus.playing,
+    );
     _syncTicker();
   }
 

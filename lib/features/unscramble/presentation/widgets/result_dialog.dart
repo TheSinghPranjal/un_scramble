@@ -15,6 +15,7 @@ Future<void> showResultDialog(
   required VoidCallback onNext,
   required VoidCallback onRetry,
   required VoidCallback onHome,
+  Future<bool> Function()? onRewardedContinue,
 }) {
   final reduceMotion = MediaQuery.disableAnimationsOf(context);
   return showGeneralDialog<void>(
@@ -34,6 +35,7 @@ Future<void> showResultDialog(
               onNext: onNext,
               onRetry: onRetry,
               onHome: onHome,
+              onRewardedContinue: onRewardedContinue,
             ),
           ),
         ],
@@ -60,9 +62,6 @@ abstract final class _Palette {
   static const tileBottom = Color(0xFF5433D6);
   static const tileLip = Color(0xFF3A1F9E);
   static const outline = Color(0xFF8B74E8);
-  static const disabledFill = Color(0xFFEDEBF2);
-  static const disabledBorder = Color(0xFFD9D6E0);
-  static const disabledText = Color(0xFF9A96A6);
   static const starLight = Color(0xFFFFE36E);
   static const starDark = Color(0xFFFFB400);
   static const sparkle = Color(0xFF9A7BFF);
@@ -74,12 +73,14 @@ class _ResultCard extends StatelessWidget {
     required this.onNext,
     required this.onRetry,
     required this.onHome,
+    required this.onRewardedContinue,
   });
 
   final UnscrambleGameState state;
   final VoidCallback onNext;
   final VoidCallback onRetry;
   final VoidCallback onHome;
+  final Future<bool> Function()? onRewardedContinue;
 
   @override
   Widget build(BuildContext context) {
@@ -165,13 +166,18 @@ class _ResultCard extends StatelessWidget {
                             label: 'Next word',
                             onPressed: onNext,
                           ),
-                          const SizedBox(height: 14),
-                          // TODO(monetization): rewarded ad → restore 1 life and resume.
-                          const _ComingSoonButton(
-                            icon: Icons.smart_display_rounded,
-                            label: 'Extra life (Ad)',
-                            caption: 'Coming soon',
-                          ),
+                          if (onRewardedContinue != null) ...[
+                            const SizedBox(height: 14),
+                            _RewardContinueButton(
+                              icon: state.status == GameStatus.lostTimeout
+                                  ? Icons.timer_rounded
+                                  : Icons.favorite_rounded,
+                              label: state.status == GameStatus.lostTimeout
+                                  ? 'Extra 30 seconds'
+                                  : 'Extra life',
+                              onWatch: onRewardedContinue!,
+                            ),
+                          ],
                         ],
                         const SizedBox(height: 16),
                         TextButton(
@@ -703,61 +709,94 @@ class _OutlineButton extends StatelessWidget {
   }
 }
 
-class _ComingSoonButton extends StatelessWidget {
-  const _ComingSoonButton({
+class _RewardContinueButton extends StatefulWidget {
+  const _RewardContinueButton({
     required this.icon,
     required this.label,
-    required this.caption,
+    required this.onWatch,
   });
 
   final IconData icon;
   final String label;
-  final String caption;
+  final Future<bool> Function() onWatch;
+
+  @override
+  State<_RewardContinueButton> createState() => _RewardContinueButtonState();
+}
+
+class _RewardContinueButtonState extends State<_RewardContinueButton> {
+  bool _busy = false;
+  bool _unavailable = false;
+
+  Future<void> _press() async {
+    if (_busy) return;
+    setState(() {
+      _busy = true;
+      _unavailable = false;
+    });
+    var earned = false;
+    try {
+      earned = await widget.onWatch();
+    } catch (error) {
+      debugPrint('AdMob rewarded show failed: code=exception message=$error');
+      earned = false;
+    }
+    if (!mounted) return;
+    if (earned) {
+      Navigator.pop(context);
+      return;
+    }
+    setState(() {
+      _busy = false;
+      _unavailable = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      enabled: false,
-      label: '$label, $caption',
-      excludeSemantics: true,
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 56),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: _Palette.disabledFill.withValues(alpha: 0.9),
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: _Palette.disabledBorder, width: 1.5),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 30, color: _Palette.disabledText),
-            const SizedBox(width: 14),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: GoogleFonts.nunito(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: _Palette.disabledText,
-                  ),
-                ),
-                Text(
-                  caption,
-                  style: GoogleFonts.nunito(
-                    fontSize: 13,
-                    color: _Palette.disabledText,
-                  ),
-                ),
-              ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        OutlinedButton.icon(
+          onPressed: _busy ? null : _press,
+          icon: _busy
+              ? const SizedBox.square(
+                  dimension: 22,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Icon(widget.icon, size: 30),
+          label: Text(widget.label),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: _Palette.accent,
+            backgroundColor: Colors.white.withValues(alpha: 0.85),
+            minimumSize: const Size.fromHeight(56),
+            side: const BorderSide(color: _Palette.outline, width: 1.5),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(22),
             ),
-          ],
+            textStyle: GoogleFonts.fredoka(
+              fontSize: 21,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ),
-      ),
+        if (_unavailable) ...[
+          const SizedBox(height: 8),
+          Text(
+            "Ad isn't available right now. You can keep playing.",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.nunito(fontSize: 13, color: _Palette.muted),
+          ),
+        ] else
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(
+              'Watch a short ad',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.nunito(fontSize: 13, color: _Palette.muted),
+            ),
+          ),
+      ],
     );
   }
 }

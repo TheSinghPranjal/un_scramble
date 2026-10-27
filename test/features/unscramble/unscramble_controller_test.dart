@@ -238,6 +238,54 @@ void main() {
       expect(state().hintUnlocked, isFalse);
     });
 
+    test('rewarded hint reveals a letter and keeps the free hint', () {
+      loseLives(2);
+      expect(state().canUseHint, isTrue);
+
+      controller.useRewardedHint();
+
+      expect(state().slots[0], 'T');
+      expect(state().hintUsed, isFalse);
+      expect(state().rewardedHintUsed, isTrue);
+      expect(state().canUseHint, isTrue);
+
+      controller.useRewardedHint();
+      expect(state().slots[1], isNull);
+
+      controller.useHint();
+      expect(state().slots[1], 'I');
+      expect(state().hintUsed, isTrue);
+    });
+
+    test('rewarded life resumes a lost round with one life', () {
+      loseLives(10);
+      expect(state().status, GameStatus.lostLives);
+      controller.grantRewardedLife();
+      expect(state().livesRemaining, 1);
+      expect(state().status, GameStatus.playing);
+
+      controller.grantRewardedLife();
+      expect(state().livesRemaining, 1);
+    });
+
+    test('rewarded time resumes a timed-out round', () {
+      for (var i = 0; i < kRoundSeconds; i++) {
+        controller.tickTimer();
+      }
+      expect(state().status, GameStatus.lostTimeout);
+      controller.grantRewardedTime();
+      expect(state().secondsRemaining, kRewardedExtraSeconds);
+      expect(state().status, GameStatus.playing);
+    });
+
+    test('retry clears a spent rewarded hint', () {
+      loseLives(2);
+      controller.useRewardedHint();
+      controller.retryRound();
+      expect(state().rewardedHintUsed, isFalse);
+      expect(state().slots.every((slot) => slot == null), isTrue);
+    });
+
     test('life letters are lost from the left', () {
       loseLives(3);
       expect(container.read(lifeLettersProvider), [

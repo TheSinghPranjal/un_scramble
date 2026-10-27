@@ -45,4 +45,19 @@ lib/
 
 `UnscrambleController` owns every rule. Widgets only call its methods. UI feedback (flashes, shakes, haptics) is driven by `state.lastEvent`, a one-shot event with an increasing `serial`.
 
-Monetization hooks are disabled stubs marked `TODO(monetization)` in the hint sheet and the lose dialog.
+```
+lib/shared/ads/          AdMob config, UMP consent, banner, interstitial, rewarded
+config/admob.json        production ids, bundled as a Flutter asset
+```
+
+## Ads
+
+Release builds request the production Android units in `config/admob.json` (publisher `pub-8661918790125012`). Debug and profile builds always use Google's test app id and test ad units, even though the production ids are in the asset.
+
+- A banner stays on the home and game screens and retries after a failed load (5s, 10s, 20s, 40s, then 60s).
+- An interstitial can show between rounds (next word or retry), at most every other break and never twice within 90 seconds. If it is not loaded, play continues. The player can close it.
+- A rewarded ad grants one extra letter on the hint sheet, one extra life after running out, or 30 extra seconds after a timeout. Closing it early grants nothing. If it is not available, the round continues.
+
+Android `applicationId` / namespace: `com.the_lazy_bear_club.un_scramble`. The iOS bundle id is different (`com.thelazybearclub.unScramble`). iOS ids in `config/admob.json` are TODO placeholders and are not read for Android release builds.
+
+Before a Play release, confirm the AdMob app is registered for `com.the_lazy_bear_club.un_scramble`, publish a Privacy & messaging (UMP) message, and host a privacy policy URL. A missing UMP message does not turn ads off. Replace the iOS TODO ids and `GADApplicationIdentifier` before shipping iOS. Build a release app bundle with `flutter build appbundle`; do not pass dart-defines. The release manifest app id is injected from `config/admob.json`, and the Gradle build rejects test or placeholder Android ids.

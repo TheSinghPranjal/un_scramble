@@ -7,6 +7,9 @@ const int kMaxLives = 10;
 /// Round length in seconds (2 minutes).
 const int kRoundSeconds = 120;
 
+/// Seconds added when a rewarded ad is earned after a timeout.
+const int kRewardedExtraSeconds = 30;
+
 /// The brand life bar. Lives are lost from LEFT to right: U, then N, then S…
 const List<String> lifeLetters = [
   'U',
@@ -139,6 +142,7 @@ class UnscrambleGameState {
     required this.secondsRemaining,
     required this.hintUnlocked,
     required this.hintUsed,
+    required this.rewardedHintUsed,
     required this.hintSheetShownThisRound,
     required this.status,
     required this.roundIndex,
@@ -158,6 +162,7 @@ class UnscrambleGameState {
     secondsRemaining: kRoundSeconds,
     hintUnlocked: false,
     hintUsed: false,
+    rewardedHintUsed: false,
     hintSheetShownThisRound: false,
     status: GameStatus.idle,
     roundIndex: 0,
@@ -183,6 +188,9 @@ class UnscrambleGameState {
   final int secondsRemaining;
   final bool hintUnlocked;
   final bool hintUsed;
+
+  /// The one rewarded extra letter for this round has been spent.
+  final bool rewardedHintUsed;
   final bool hintSheetShownThisRound;
   final GameStatus status;
   final int roundIndex;
@@ -212,6 +220,7 @@ class UnscrambleGameState {
     int? secondsRemaining,
     bool? hintUnlocked,
     bool? hintUsed,
+    bool? rewardedHintUsed,
     bool? hintSheetShownThisRound,
     GameStatus? status,
     int? roundIndex,
@@ -231,6 +240,7 @@ class UnscrambleGameState {
       secondsRemaining: secondsRemaining ?? this.secondsRemaining,
       hintUnlocked: hintUnlocked ?? this.hintUnlocked,
       hintUsed: hintUsed ?? this.hintUsed,
+      rewardedHintUsed: rewardedHintUsed ?? this.rewardedHintUsed,
       hintSheetShownThisRound:
           hintSheetShownThisRound ?? this.hintSheetShownThisRound,
       status: status ?? this.status,
