@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Matches GameColors.light.backgroundTop so the launch window meets the splash. -->
+    <color name="splash_background">#F1ECFF</color>
+</resources>
