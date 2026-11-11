@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'features/unscramble/presentation/home_screen.dart';
+import 'features/unscramble/presentation/splash_screen.dart';
 import 'shared/ads/ad_providers.dart';
 import 'shared/ads/banner_ad_slot.dart';
 import 'shared/theme/app_theme.dart';
@@ -52,7 +52,7 @@ class _UnscrambleAppState extends ConsumerState<UnscrambleApp> {
           ],
         );
       },
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }
